@@ -64,7 +64,7 @@ where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and
 ```
 Проведена оптимизация:  
 * удалена сортировка,
-* Удалена таблица film,
+* удалена таблица film,
 * удалена таблица inventory,
 * добавлена группировка.
 
@@ -86,3 +86,14 @@ where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and
 GROUP BY concat(c.last_name, ' ', c.first_name);
 ```
 ![](https://github.com/eskin-igor/netology_12-5/blob/main/12-5/12-05-2-4.JPG)
+```
+-> Table scan on <temporary>  (actual time=30..30 rows=391 loops=1)
+    -> Aggregate using temporary table  (actual time=30..30 rows=391 loops=1)
+        -> Nested loop inner join  (cost=25368 rows=17130) (actual time=0.797..26.5 rows=642 loops=1)
+            -> Nested loop inner join  (cost=19373 rows=17130) (actual time=0.772..21 rows=642 loops=1)
+                -> Filter: (cast(p.payment_date as date) = '2005-07-30')  (cost=1674 rows=16500) (actual time=0.71..13.5 rows=634 loops=1)
+                    -> Table scan on p  (cost=1674 rows=16500) (actual time=0.68..9.98 rows=16044 loops=1)
+                -> Covering index lookup on r using rental_date (rental_date=p.payment_date)  (cost=0.969 rows=1.04) (actual time=0.00793..0.0114 rows=1.01 loops=634)
+            -> Single-row index lookup on c using PRIMARY (customer_id=r.customer_id)  (cost=0.25 rows=1) (actual time=0.00781..0.00807 rows=1 loops=642)
+```
+
